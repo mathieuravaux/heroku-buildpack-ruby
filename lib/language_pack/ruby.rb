@@ -217,7 +217,6 @@ private
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
       command = "env GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base} gem update --system --verbose --backtrace 2>&1"
-      puts run()
       topic "Updating rubygems (#{command})"
       pipe(command)
       version = run("gem --version").strip
