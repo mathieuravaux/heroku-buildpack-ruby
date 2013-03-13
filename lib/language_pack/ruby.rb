@@ -68,15 +68,19 @@ class LanguagePack::Ruby < LanguagePack::Base
   end
 
   def compile
+    topic "compile"
     Dir.chdir(build_path)
     remove_vendor_bundle
+    topic "Installing ruby"
     install_ruby
     install_jvm
+    topic "Configuring ENV variables "
     setup_language_pack_environment
     setup_profiled
     update_rubygems
     write_git_hash
     allow_git do
+      topic "Installing bundler"
       install_language_pack_gems
       build_bundler
       create_database_yml
@@ -328,7 +332,7 @@ ERROR
   def write_git_hash
     topic "Saving the git hash"
     puts "GIT_DIR: #{ENV['GIT_DIR']}"
-    puts run("ls #{ENV['GIT_DIR']}")
+    puts run("ls -alh #{ENV['GIT_DIR']}/.git")
   end
 
   # installs vendored gems into the slug
@@ -433,7 +437,8 @@ ERROR
         pwd            = run("pwd").chomp
         # we need to set BUNDLE_CONFIG and BUNDLE_GEMFILE for
         # codon since it uses bundler.
-        env_vars       = "env BUNDLE_GEMFILE=#{pwd}/Gemfile BUNDLE_CONFIG=#{pwd}/.bundle/config CPATH=#{yaml_include}:$CPATH CPPATH=#{yaml_include}:$CPPATH LIBRARY_PATH=#{yaml_lib}:$LIBRARY_PATH RUBYOPT=\"#{syck_hack}\""
+        env_vars       = "env BUNDLE_GEMFILE=#{pwd}/Gemfile BUNDLE_CONFIG=#{pwd}/.bundle/config CPATH=#{yaml_include}:$CPATH CPPATH=#{yaml_include}:$CPPATH LIBRARY_PATH=#{yaml_lib}:$LIBRARY_PATH RUBYOPT=\"#{syck_hack}\"" +
+            " GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base}"
         puts "Running: #{bundle_command}"
         bundler_output << pipe("#{env_vars} #{bundle_command} --no-clean 2>&1")
 
