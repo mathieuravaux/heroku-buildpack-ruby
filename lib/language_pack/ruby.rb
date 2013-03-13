@@ -216,8 +216,9 @@ private
   def update_rubygems
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
-      topic "Updating rubygems"
-      pipe("gem update --system 2>&1")
+      command = "env GEM_PATH=#{slug_vendor_base} gem update --system 2>&1"
+      topic "Updating rubygems (#{coommand})"
+      pipe(command)
       version = run("gem --version").strip
     end
     puts "Using rubygems version #{version}"
