@@ -1,4 +1,4 @@
-require "tmpdir"
+  require "tmpdir"
 require "rubygems"
 require "language_pack"
 require "language_pack/base"
@@ -217,7 +217,7 @@ private
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
       command = "env GEM_PATH=#{slug_vendor_base} gem update --system 2>&1"
-      topic "Updating rubygems (#{coommand})"
+      topic "Updating rubygems (#{command})"
       pipe(command)
       version = run("gem --version").strip
     end
