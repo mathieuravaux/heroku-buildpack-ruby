@@ -332,7 +332,9 @@ ERROR
   def write_git_hash
     topic "Saving the git hash"
     puts "GIT_DIR: #{ENV['GIT_DIR']}"
-    puts run("ls -alh #{ENV['GIT_DIR']}/.git")
+    puts run("pwd")
+    puts run("ls -alh")
+    puts run("ls -alh .git")
   end
 
   # installs vendored gems into the slug
@@ -438,7 +440,7 @@ ERROR
         # we need to set BUNDLE_CONFIG and BUNDLE_GEMFILE for
         # codon since it uses bundler.
         env_vars       = "env BUNDLE_GEMFILE=#{pwd}/Gemfile BUNDLE_CONFIG=#{pwd}/.bundle/config CPATH=#{yaml_include}:$CPATH CPPATH=#{yaml_include}:$CPPATH LIBRARY_PATH=#{yaml_lib}:$LIBRARY_PATH RUBYOPT=\"#{syck_hack}\"" +
-            " GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base}"
+            " GEM_HOME=#{slug_vendor_base} GEM_PATH=#{slug_vendor_base}"
         puts "Running: #{bundle_command}"
         bundler_output << pipe("#{env_vars} #{bundle_command} --no-clean 2>&1")
 
