@@ -75,6 +75,7 @@ class LanguagePack::Ruby < LanguagePack::Base
     setup_language_pack_environment
     setup_profiled
     update_rubygems
+    write_git_hash
     allow_git do
       install_language_pack_gems
       build_bundler
@@ -216,10 +217,16 @@ private
   def update_rubygems
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
-      command = "env GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base} gem update --system --verbose --backtrace 2>&1"
+      purge_bundler_cache
+      command = "env GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base} gem update --system --backtrace 2>&1"
       topic "Updating rubygems (#{command})"
       pipe(command)
       version = run("gem --version").strip
+      
+      puts "rubygems version without env vars: #{version}"
+      version_with_env_vars = run("env GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base} gem --version").strip
+      puts "rubygems version with    env vars: #{version_with_env_vars}"
+      
     end
     puts "Using rubygems version #{version}"
   end
@@ -316,6 +323,12 @@ ERROR
   # @return [Array] resulting list of gems
   def gems
     [BUNDLER_GEM_PATH]
+  end
+
+  def write_git_hash
+    topic "Saving the git hash"
+    puts "GIT_DIR: #{ENV['GIT_DIR']}"
+    puts run("ls #{ENV['GIT_DIR']}")
   end
 
   # installs vendored gems into the slug
