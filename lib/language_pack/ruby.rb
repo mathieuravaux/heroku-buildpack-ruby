@@ -18,6 +18,7 @@ class LanguagePack::Ruby < LanguagePack::Base
   NODE_JS_BINARY_PATH = "node-#{NODE_VERSION}"
   JVM_BASE_URL        = "http://heroku-jvm-langpack-java.s3.amazonaws.com"
   JVM_VERSION         = "openjdk7-latest"
+  MIN_RUBYGEMS_VERSION = "2.0.3"
 
   # detects if this is a valid Ruby app
   # @return [Boolean] true if it's a Ruby app
@@ -73,6 +74,7 @@ class LanguagePack::Ruby < LanguagePack::Base
     install_jvm
     setup_language_pack_environment
     setup_profiled
+    update_rubygems
     allow_git do
       install_language_pack_gems
       build_bundler
@@ -208,6 +210,17 @@ private
       set_env_default "JAVA_OPTS", default_java_opts
       set_env_default "JRUBY_OPTS", default_jruby_opts
     end
+  end
+
+  # updates rubygems if the version is too old
+  def update_rubygems
+    version = run("gem --version").strip
+    if version < MIN_RUBYGEMS_VERSION
+      topic "Updating rubygems"
+      run("gem update --system")
+      version = run("gem --version").strip
+    end
+    puts "Using rubygems version #{version}"
   end
 
   # determines if a build ruby is required
