@@ -35,7 +35,7 @@ class LanguagePack::Ruby < LanguagePack::Base
     gem_version = nil
     bootstrap_bundler do |bundler_path|
       $: << "#{bundler_path}/gems/bundler-#{LanguagePack::Ruby::BUNDLER_VERSION}/lib"
-      gem         = lockfile_parser.specs.detect {|gem| gem.name == name }
+      gem         = lockfile_parser.specs.detect {|g| g.name == name }
       gem_version = gem.version if gem
     end
 
@@ -216,7 +216,8 @@ private
   def update_rubygems
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
-      command = "env GEM_PATH=#{slug_vendor_base} gem update --system --verbose --backtrace 2>&1"
+      command = "env GEM_HOME=#{slug_vendor_base} PATH=$HOME/bin:$HOME/#{slug_vendor_base}/bin GEM_PATH=#{slug_vendor_base} gem update --system --verbose --backtrace 2>&1"
+      puts run()
       topic "Updating rubygems (#{command})"
       pipe(command)
       version = run("gem --version").strip
@@ -362,7 +363,7 @@ ERROR
   # @param [String] tmpdir to store the libyaml files
   def install_libyaml(dir)
     FileUtils.mkdir_p dir
-    Dir.chdir(dir) do |dir|
+    Dir.chdir(dir) do |d|
       run("curl #{VENDOR_URL}/#{LIBYAML_PATH}.tgz -s -o - | tar xzf -")
     end
   end
