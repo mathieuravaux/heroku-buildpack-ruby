@@ -217,7 +217,7 @@ private
     version = run("gem --version").strip
     if version < MIN_RUBYGEMS_VERSION
       topic "Updating rubygems"
-      run("gem update --system")
+      pipe("gem update --system 2>&1")
       version = run("gem --version").strip
     end
     puts "Using rubygems version #{version}"
